@@ -10,7 +10,8 @@ This is a greatly upgraded and enhanced version of the Credential Harvester payl
 
 ============================== **UPDATES** ===============================
 
-From now on updates will be included in the releases
+- From now on updates will be included in the releases
+- All versions have been tested to work on a standart Windows 10 version
 
 ====================================================================
 
