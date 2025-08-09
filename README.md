@@ -17,7 +17,7 @@ This is a greatly upgraded and enhanced version of the Credential Harvester payl
 
 ================================ **OPTIONS** =============================
 
-You can change the open powershell for this line in case you need the window to stay hidden during the execution of the payload (this will work for all versions of this payload)
+You can change the open powershell for this line in case you need the window to stay hidden during the execution of the payload (this might not work for all versions of this payload)
 
 ====================================================================
 
