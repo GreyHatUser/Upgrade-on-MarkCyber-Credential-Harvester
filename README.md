@@ -1,5 +1,6 @@
-# Upgrade-on-MarkCyber-Credential-Harvester
-This is a greatly upgraded and enhanced version of the Credential Harvester payload initially made by MarkCyber, it includes many security, failsafe and forsenic trace deletion that werent included on the first payload.
+# Credential-Exfiltration Payload
+This is a greatly upgraded and enhanced version of the 'initially based on' Credential Harvester payload made by MarkCyber, it includes many security, failsafe and forsenic trace deletion that werent included on the first payload.
+After the 2.0.0 it became purely my own work as the amount of upgrades greatly differ from the original source.
 
 ========================== **READ ME & CREDITS** ===========================
 - Script based on **markcyber's** work, updated for stealthier operation by **Nonnamme** (GreyHatUser)
